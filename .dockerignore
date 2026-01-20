@@ -1,0 +1,12 @@
+node_modules
+yarn-error.log
+.git
+.gitignore
+README.md
+.env
+.env.local
+.env.*.local
+.vscode
+.idea
+*.md
+.claude

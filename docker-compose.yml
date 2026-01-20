@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  simple-math:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simple-math
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
