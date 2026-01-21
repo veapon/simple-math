@@ -22,7 +22,6 @@ function Homepage() {
         padding: '50px',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
         gap: '24px',
         background: '#f0f2f5'
@@ -31,7 +30,7 @@ function Homepage() {
           <Title level={1}>简数</Title>
           <Title level={4} type="secondary" style={{ fontStyle : 'italic'}}>简简单单的学习数学</Title>
         </div>
-        <Space direction="vertical" size="middle">
+        <Space orientation="vertical" size="middle">
           <Button
             type="primary"
             onClick={() => navigate('/config')}

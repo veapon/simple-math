@@ -80,7 +80,7 @@ function ConfigPage() {
         background: '#f0f2f5'
       }}>
         <Card style={{ width: '100%', maxWidth: '500px', height: 'fit-content' }} title={'题目设置'}>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Space orientation="vertical" size="large" style={{ width: '100%' }}>
             {/* 运算类型 */}
             <div>
               <Title level={5}>运算</Title>

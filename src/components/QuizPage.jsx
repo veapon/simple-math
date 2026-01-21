@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Layout, Typography, Input, Button, Space, Progress, Card, message, Tag, Popconfirm } from 'antd'
+import {Layout, Typography, Input, Button, Space, Progress, Card, message, Tag, Popconfirm, InputNumber} from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { LogoutOutlined } from '@ant-design/icons'
 import { generateQuestions } from '../utils/questionGenerator'
@@ -50,12 +50,13 @@ function QuizPage() {
   }
 
   const handleSubmit = () => {
-    if (currentAnswer.trim() === '') {
+    console.log(currentAnswer);
+    if (currentAnswer === null || currentAnswer === undefined || currentAnswer === '') {
       message.warning('请输入答案')
       return
     }
 
-    const answerNum = parseInt(currentAnswer.trim(), 10)
+    const answerNum = currentAnswer
     if (isNaN(answerNum)) {
       message.warning('请输入有效的数字')
       return
@@ -107,14 +108,20 @@ function QuizPage() {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', height: '100vh' }}>
       <Header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
         background: '#fff',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         padding: '0 24px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        height: '64px'
       }}>
         <Title level={3} style={{ margin: 0, color: '#1890ff' }}>简数</Title>
         <Popconfirm
@@ -130,11 +137,13 @@ function QuizPage() {
 
       <Content style={{
         padding: '24px',
+        paddingTop: '88px',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         background: '#f0f2f5',
-        height: 'calc(100vh - 64px)'
+        minHeight: 'calc(100vh - 64px)',
+        overflowY: 'auto'
       }}>
         <Card style={{ width: '100%', maxWidth: '500px', textAlign: 'center' }}>
           <Progress
@@ -152,16 +161,16 @@ function QuizPage() {
             {formatQuestion(currentQuestion.question)}
           </Title>
 
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <Input
-              size="large"
+          <Space orientation="vertical" size="large" style={{ width: '100%' }}>
+            <InputNumber
+              controls={false}
               value={currentAnswer}
-              onChange={(e) => setCurrentAnswer(e.target.value)}
+              onChange={e => setCurrentAnswer(e)}
               onKeyPress={handleKeyPress}
               placeholder="请输入答案"
-              autoFocus
-              style={{ fontSize: '24px', textAlign: 'center', height: '60px' }}
+              style={{ width: '100%', height: '60px', fontSize: '18px' }}
               disabled={isSubmitted}
+              required={true}
             />
 
             {isSubmitted && (

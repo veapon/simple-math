@@ -2,9 +2,10 @@ version: '3.8'
 
 services:
   simple-math:
-    build:
-      context: .
-      dockerfile: Dockerfile
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    image: veapon/simple-math:latest
     container_name: simple-math
     ports:
       - "3000:80"

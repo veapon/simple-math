@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Layout, Typography, Card, Button, Space, Tag, List, Divider } from 'antd'
+import { Layout, Typography, Card, Button, Space, Tag, Divider } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { CheckCircleOutlined, CloseCircleOutlined, HomeOutlined } from '@ant-design/icons'
 
@@ -82,13 +82,12 @@ function QuizSummary() {
 
           {/* Question Details */}
           <Title level={4}>题目详情</Title>
-          <List
-            dataSource={questions.map((q, idx) => ({ ...q, userAnswer: userAnswers[idx], idx }))}
-            renderItem={(item) => {
-              const isCorrect = item.answer === item.userAnswer
+          <div>
+            {questions.map((q, idx) => {
+              const isCorrect = q.answer === userAnswers[idx]
               return (
-                <List.Item
-                  key={item.idx}
+                <Card
+                  key={idx}
                   style={{
                     padding: '16px',
                     background: isCorrect ? '#f6ffed' : '#fff1f0',
@@ -96,32 +95,28 @@ function QuizSummary() {
                     marginBottom: '12px'
                   }}
                 >
-                  <List.Item.Meta
-                    avatar={
-                      isCorrect ? (
-                        <CheckCircleOutlined style={{ fontSize: '24px', color: '#52c41a' }} />
-                      ) : (
-                        <CloseCircleOutlined style={{ fontSize: '24px', color: '#f5222d' }} />
-                      )
-                    }
-                    title={
-                      <Text style={{ fontSize: '18px', fontFamily: 'monospace' }}>
-                        {item.idx + 1}. {formatQuestion(item.question)}
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    {isCorrect ? (
+                      <CheckCircleOutlined style={{ fontSize: '24px', color: '#52c41a' }} />
+                    ) : (
+                      <CloseCircleOutlined style={{ fontSize: '24px', color: '#f5222d' }} />
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <Text style={{ fontSize: '18px', fontFamily: 'monospace', display: 'block' }}>
+                        {idx + 1}. {formatQuestion(q.question)}
                       </Text>
-                    }
-                    description={
-                      <Space direction="vertical" size="small">
-                        <Text>你的答案: {item.userAnswer ?? '未作答'}</Text>
+                      <Space orientation="vertical" size="small" style={{ marginTop: '8px' }}>
+                        <Text>你的答案: {userAnswers[idx] ?? '未作答'}</Text>
                         {!isCorrect && (
-                          <Text type="danger">正确答案: {item.answer}</Text>
+                          <Text type="danger">正确答案: {q.answer}</Text>
                         )}
                       </Space>
-                    }
-                  />
-                </List.Item>
+                    </div>
+                  </div>
+                </Card>
               )
-            }}
-          />
+            })}
+          </div>
 
           <Divider />
 
