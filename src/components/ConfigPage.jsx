@@ -112,6 +112,7 @@ function ConfigPage() {
                 style={{ width: '100%' }}
                 optionType="button"
                 buttonStyle="solid"
+                size={'small'}
               >
                 {RANGE_OPTIONS.map(option => (
                   <Radio.Button key={option.value} value={option.value}>
@@ -142,6 +143,7 @@ function ConfigPage() {
                 style={{ width: '100%' }}
                 optionType="button"
                 buttonStyle="solid"
+                size={'small'}
               >
                 {QUESTION_COUNT_OPTIONS.map(option => (
                   <Radio.Button key={option.value} value={option.value}>

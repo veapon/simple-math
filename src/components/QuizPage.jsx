@@ -37,6 +37,13 @@ function QuizPage() {
     }
   }, [config, navigate, location.state?.originalQuestions])
 
+  // Reset submit state when question changes to prevent showing next answer
+  useEffect(() => {
+    setIsSubmitted(false)
+    setIsCorrect(false)
+    setCurrentAnswer('')
+  }, [currentIndex])
+
   if (!questions.length) {
     return null
   }
@@ -80,10 +87,11 @@ function QuizPage() {
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1)
-      setCurrentAnswer('')
+      // Reset submit state BEFORE changing question to prevent showing next answer
       setIsSubmitted(false)
       setIsCorrect(false)
+      setCurrentAnswer('')
+      setCurrentIndex(currentIndex + 1)
     } else {
       // Quiz completed, navigate to summary
       navigate('/quiz/summary', {
@@ -164,6 +172,7 @@ function QuizPage() {
           <Space orientation="vertical" size="large" style={{ width: '100%' }}>
             <InputNumber
               controls={false}
+              inputMode="decimal"
               value={currentAnswer}
               onChange={e => setCurrentAnswer(e)}
               onKeyPress={handleKeyPress}
@@ -173,19 +182,19 @@ function QuizPage() {
               required={true}
             />
 
-            {isSubmitted && (
-              <Tag
-                color={isCorrect ? 'success' : 'error'}
-                style={{
-                  fontSize: '16px',
-                  padding: '8px 24px',
-                  height: 'auto',
-                  lineHeight: '24px'
-                }}
-              >
-                {isCorrect ? '正确!' : `错误! 正确答案: ${currentQuestion.answer}`}
-              </Tag>
-            )}
+            <Tag
+              key={currentIndex}
+              color={isCorrect ? 'success' : 'error'}
+              style={{
+                fontSize: '16px',
+                padding: '8px 24px',
+                height: 'auto',
+                lineHeight: '24px',
+                visibility: isSubmitted ? 'visible' : 'hidden'
+              }}
+            >
+              {isCorrect ? '正确!' : `错误! 正确答案: ${currentQuestion.answer}`}
+            </Tag>
 
             {!isSubmitted ? (
               <Button

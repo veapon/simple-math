@@ -3,62 +3,89 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// Generate an addition question
+// Generate an addition question (ensure result is within range)
 function generateAddition(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(min, max)
+  // Generate result first, then work backwards to ensure all numbers are within range
+  const answer = randomInt(min + 1, max)
+  const a = randomInt(min, answer - 1)
+  const b = answer - a
   return {
     question: `${a} + ${b} =`,
-    answer: a + b
+    answer: answer
   }
 }
 
-// Generate a subtraction question (ensure non-negative result for primary school)
+// Generate a subtraction question (ensure all numbers are within range)
 function generateSubtraction(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(min, max)
-  // Ensure result is non-negative
-  if (a >= b) {
-    return {
-      question: `${a} - ${b} =`,
-      answer: a - b
+  // Generate a, b, and result all within range, ensuring result is non-negative
+  const a = randomInt(min + 1, max)
+  const b = randomInt(min, a - 1)
+  const result = a - b
+  return {
+    question: `${a} - ${b} =`,
+    answer: result
+  }
+}
+
+// Generate a multiplication question (ensure product is within range)
+function generateMultiplication(min, max) {
+  // For primary school, cap max at 12 for multiplication table style
+  const actualMax = Math.min(max, 12)
+
+  // Generate factors where both are within range and product is within range
+  // Generate result first, then find factors
+  const answer = randomInt(min, actualMax)
+
+  // Find all factor pairs of answer
+  const factors = []
+  for (let a = min; a <= answer; a++) {
+    if (answer % a === 0 && answer / a <= actualMax) {
+      factors.push([a, answer / a])
     }
   }
-  return {
-    question: `${b} - ${a} =`,
-    answer: b - a
-  }
-}
 
-// Generate a multiplication question
-function generateMultiplication(min, max) {
-  // For multiplication, use smaller range for primary school
-  const actualMax = Math.min(max, 12) // Standard multiplication table goes up to 12
-  const a = randomInt(min, actualMax)
-  const b = randomInt(1, 10) // Second factor typically 1-10 for primary school
+  // If no valid factors found, use simple fallback
+  if (factors.length === 0) {
+    return {
+      question: `1 × ${answer} =`,
+      answer: answer
+    }
+  }
+
+  // Randomly select a factor pair
+  const [a, b] = factors[randomInt(0, factors.length - 1)]
   return {
     question: `${a} × ${b} =`,
-    answer: a * b
+    answer: answer
   }
 }
 
-// Generate a division question (ensure whole number result)
+// Generate a division question (ensure dividend, divisor, and answer are all within range)
 function generateDivision(min, max) {
-  // Generate answer first, then work backwards
-  const answer = randomInt(min, Math.min(max, 12))
-  const divisor = randomInt(1, 10)
+  // For primary school, cap max at 12 for division table style
+  const actualMax = Math.min(max, 12)
+
+  // Generate answer first
+  const answer = randomInt(min, actualMax)
+
+  // Generate divisor such that dividend = answer × divisor ≤ actualMax
+  // divisor must be between 1 and actualMax/answer
+  const maxDivisor = Math.floor(actualMax / answer)
+  const divisor = randomInt(1, Math.max(2, maxDivisor))
   const dividend = answer * divisor
+
   return {
     question: `${dividend} ÷ ${divisor} =`,
     answer: answer
   }
 }
 
-// Reverse type: ( ) + b = c, a + ( ) = c
+// Reverse type: ( ) + b = c, a + ( ) = c (ensure all numbers within range)
 function generateReverseAddition(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(min, max)
-  const sum = a + b
+  // Generate sum first, then operands
+  const sum = randomInt(min + 1, max)
+  const a = randomInt(min, sum - 1)
+  const b = sum - a
   // Randomly choose which number to hide
   if (Math.random() < 0.5) {
     return {
@@ -73,8 +100,9 @@ function generateReverseAddition(min, max) {
 }
 
 function generateReverseSubtraction(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(min, a) // b must be <= a to keep result non-negative
+  // Generate all three numbers within range
+  const a = randomInt(min + 1, max)
+  const b = randomInt(min, a - 1)
   const result = a - b
   // Randomly choose which number to hide
   if (Math.random() < 0.5) {
@@ -90,10 +118,31 @@ function generateReverseSubtraction(min, max) {
 }
 
 function generateReverseMultiplication(min, max) {
+  // For primary school, cap max at 12
   const actualMax = Math.min(max, 12)
-  const a = randomInt(min, actualMax)
-  const b = randomInt(1, 10)
-  const product = a * b
+
+  // Generate product first within range
+  const product = randomInt(min, actualMax)
+
+  // Find all factor pairs
+  const factors = []
+  for (let a = min; a <= product; a++) {
+    if (product % a === 0 && product / a <= actualMax) {
+      factors.push([a, product / a])
+    }
+  }
+
+  // If no valid factors, use fallback
+  if (factors.length === 0) {
+    return {
+      question: `( ) × 1 = ${product}`,
+      answer: product
+    }
+  }
+
+  // Randomly select a factor pair
+  const [a, b] = factors[randomInt(0, factors.length - 1)]
+
   // Randomly choose which number to hide
   if (Math.random() < 0.5) {
     return {
@@ -108,9 +157,17 @@ function generateReverseMultiplication(min, max) {
 }
 
 function generateReverseDivision(min, max) {
-  const divisor = randomInt(1, 10)
-  const answer = randomInt(min, Math.min(max, 12))
-  const dividend = divisor * answer
+  // For primary school, cap max at 12
+  const actualMax = Math.min(max, 12)
+
+  // Generate answer first
+  const answer = randomInt(min, actualMax)
+
+  // Generate divisor such that dividend = answer × divisor ≤ actualMax
+  const maxDivisor = Math.floor(actualMax / answer)
+  const divisor = randomInt(1, Math.max(2, maxDivisor))
+  const dividend = answer * divisor
+
   // Randomly choose which number to hide (dividend or divisor)
   if (Math.random() < 0.5) {
     return {
@@ -124,22 +181,29 @@ function generateReverseDivision(min, max) {
   }
 }
 
-// Continuous operations: a + b + c = (), a + b + () = c
+// Continuous operations: a + b + c = (), a + b + () = c (ensure all numbers within range)
 function generateContinuousAddition(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(min, max)
-  const c = randomInt(min, max)
+  // Generate sum first, then work backwards to ensure all numbers are within range
+  const sum = randomInt(min + 2, max)
+  // Generate three numbers that sum to the total
+  const a = randomInt(min, sum - 2)
+  const remainingAfterA = sum - a
+  const b = randomInt(min, remainingAfterA - 1)
+  const c = remainingAfterA - b
   return {
     question: `${a} + ${b} + ${c} =`,
-    answer: a + b + c
+    answer: sum
   }
 }
 
 function generateContinuousAdditionWithMissing(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(min, max)
-  const c = randomInt(min, max)
-  const sum = a + b + c
+  // Generate sum first, then work backwards
+  const sum = randomInt(min + 2, max)
+  const a = randomInt(min, sum - 2)
+  const remainingAfterA = sum - a
+  const b = randomInt(min, remainingAfterA - 1)
+  const c = remainingAfterA - b
+
   // Randomly choose which number to hide
   const missing = randomInt(0, 2)
   if (missing === 0) {
@@ -161,10 +225,11 @@ function generateContinuousAdditionWithMissing(min, max) {
 }
 
 function generateContinuousSubtraction(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(Math.min(min, 1), Math.min(a, max))
+  // Generate all numbers within range
+  const a = randomInt(min + 2, max)
+  const b = randomInt(1, a - 1)
   const result1 = a - b
-  const c = randomInt(Math.min(min, 1), Math.min(result1, max))
+  const c = randomInt(1, result1 - 1)
   return {
     question: `${a} - ${b} - ${c} =`,
     answer: result1 - c
@@ -172,21 +237,17 @@ function generateContinuousSubtraction(min, max) {
 }
 
 function generateContinuousMixed(min, max) {
-  const a = randomInt(min, max)
-  const b = randomInt(min, max)
-  const c = randomInt(1, Math.min(max, 10))
-  const sum = a + b
-  const result = sum - c
-  if (result >= 0) {
-    return {
-      question: `${a} + ${b} - ${c} =`,
-      answer: result
-    }
-  }
-  // If result is negative, swap operations
+  // Generate result first, then work backwards for a + b - c = result
+  // This ensures all numbers (a, b, c, and result) are within range
+  const result = randomInt(min, max - 2)
+  const c = randomInt(min, max - result - 1)
+  const sum = result + c
+  const a = randomInt(min, sum - 1)
+  const b = sum - a
+
   return {
-    question: `${a} - ${b} + ${c} =`,
-    answer: a - b + c
+    question: `${a} + ${b} - ${c} =`,
+    answer: result
   }
 }
 
