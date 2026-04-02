@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Layout, Typography, Card, Radio, InputNumber, Button, Space, Tag, Slider } from 'antd'
+import { Layout, Typography, Card, Radio, InputNumber, Button, Space, Tag } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
 const { Header, Content } = Layout
@@ -12,12 +12,7 @@ const OPERATION_OPTIONS = [
   { label: '除法', value: 'division' },
 ]
 
-const RANGE_OPTIONS = [
-  { label: '10以内', value: 10 },
-  { label: '20以内', value: 20 },
-  { label: '100以内', value: 100 },
-  { label: '自定义', value: 'custom' },
-]
+
 
 const QUESTION_COUNT_OPTIONS = [
   { label: '10题', value: 10 },
@@ -35,15 +30,15 @@ function ConfigPage() {
   const navigate = useNavigate()
   const [operations, setOperations] = useState(['addition'])
   const [questionTypes, setQuestionTypes] = useState([])
-  const [rangeType, setRangeType] = useState(10)
-  const [customRange, setCustomRange] = useState([1, 100])
+  const [rangeMin, setRangeMin] = useState(1)
+  const [rangeMax, setRangeMax] = useState(10)
   const [questionCountType, setQuestionCountType] = useState(10)
   const [customQuestionCount, setCustomQuestionCount] = useState(50)
 
   const getConfig = () => ({
     operations,
     questionTypes,
-    range: rangeType === 'custom' ? customRange : [1, rangeType],
+    range: [rangeMin, rangeMax],
     questionCount: questionCountType === 'custom' ? customQuestionCount : questionCountType,
   })
 
@@ -106,32 +101,34 @@ function ConfigPage() {
             {/* 数值范围 */}
             <div>
               <Title level={5}>范围</Title>
-              <Radio.Group
-                value={rangeType}
-                onChange={(e) => setRangeType(e.target.value)}
-                style={{ width: '100%' }}
-                optionType="button"
-                buttonStyle="solid"
-                size={'small'}
-              >
-                {RANGE_OPTIONS.map(option => (
-                  <Radio.Button key={option.value} value={option.value}>
-                    {option.label}
-                  </Radio.Button>
-                ))}
-              </Radio.Group>
-              {rangeType === 'custom' && (
-                <div style={{ marginTop: '16px' }}>
-                  <Slider
-                    range
-                    min={1}
-                    max={1000}
-                    value={customRange}
-                    onChange={setCustomRange}
-                    marks={{ 1: '1', 100: '100', 500: '500', 1000: '1000' }}
-                  />
-                </div>
-              )}
+              <Space.Compact style={{ width: '100%' }}>
+                <InputNumber
+                  min={1}
+                  max={rangeMax - 1}
+                  value={rangeMin}
+                  onChange={(value) => value && setRangeMin(value)}
+                  style={{ width: '45%' }}
+                  placeholder="最小值"
+                />
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '10%',
+                  background: '#fafafa',
+                  border: '1px solid #d9d9d9',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                }}>~</div>
+                <InputNumber
+                  min={rangeMin + 1}
+                  max={10000}
+                  value={rangeMax}
+                  onChange={(value) => value && setRangeMax(value)}
+                  style={{ width: '45%' }}
+                  placeholder="最大值"
+                />
+              </Space.Compact>
             </div>
 
             {/* 题量 */}

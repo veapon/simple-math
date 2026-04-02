@@ -183,12 +183,15 @@ function generateReverseDivision(min, max) {
 
 // Continuous operations: a + b + c = (), a + b + () = c (ensure all numbers within range)
 function generateContinuousAddition(min, max) {
-  // Generate sum first, then work backwards to ensure all numbers are within range
-  const sum = randomInt(min + 2, max)
-  // Generate three numbers that sum to the total
-  const a = randomInt(min, sum - 2)
+  // Each operand must be at least lo (>= 1 to avoid trivial 0s)
+  const lo = Math.max(min, 1)
+  // sum must be >= 3*lo so each of the 3 operands can be >= lo
+  const sum = randomInt(3 * lo, max)
+  // Constrain a so remaining (sum - a) >= 2*lo, leaving room for b and c
+  const a = randomInt(lo, sum - 2 * lo)
   const remainingAfterA = sum - a
-  const b = randomInt(min, remainingAfterA - 1)
+  // Constrain b so c = remaining - b >= lo
+  const b = randomInt(lo, remainingAfterA - lo)
   const c = remainingAfterA - b
   return {
     question: `${a} + ${b} + ${c} =`,
@@ -197,11 +200,11 @@ function generateContinuousAddition(min, max) {
 }
 
 function generateContinuousAdditionWithMissing(min, max) {
-  // Generate sum first, then work backwards
-  const sum = randomInt(min + 2, max)
-  const a = randomInt(min, sum - 2)
+  const lo = Math.max(min, 1)
+  const sum = randomInt(3 * lo, max)
+  const a = randomInt(lo, sum - 2 * lo)
   const remainingAfterA = sum - a
-  const b = randomInt(min, remainingAfterA - 1)
+  const b = randomInt(lo, remainingAfterA - lo)
   const c = remainingAfterA - b
 
   // Randomly choose which number to hide
@@ -225,24 +228,28 @@ function generateContinuousAdditionWithMissing(min, max) {
 }
 
 function generateContinuousSubtraction(min, max) {
-  // Generate all numbers within range
-  const a = randomInt(min + 2, max)
-  const b = randomInt(1, a - 1)
-  const result1 = a - b
-  const c = randomInt(1, result1 - 1)
+  const lo = Math.max(min, 1)
+  // Need a >= 2*lo so both b and c can be >= lo and result >= 0
+  const a = randomInt(2 * lo, max)
+  // b in [lo, a - lo] ensures afterB = a - b >= lo
+  const b = randomInt(lo, a - lo)
+  const afterB = a - b
+  // c in [lo, afterB] ensures result = afterB - c >= 0
+  const c = randomInt(lo, afterB)
   return {
     question: `${a} - ${b} - ${c} =`,
-    answer: result1 - c
+    answer: afterB - c
   }
 }
 
 function generateContinuousMixed(min, max) {
-  // Generate result first, then work backwards for a + b - c = result
-  // This ensures all numbers (a, b, c, and result) are within range
-  const result = randomInt(min, max - 2)
-  const c = randomInt(min, max - result - 1)
-  const sum = result + c
-  const a = randomInt(min, sum - 1)
+  const lo = Math.max(min, 1)
+  // a + b - c = result, where a, b, c >= lo, result >= 0
+  // Generate result and c first, then split (result + c) into a + b
+  const result = randomInt(lo, max - 2 * lo)
+  const c = randomInt(lo, max - result - lo)
+  const sum = result + c // sum >= 2*lo since result >= lo and c >= lo
+  const a = randomInt(lo, sum - lo)
   const b = sum - a
 
   return {
